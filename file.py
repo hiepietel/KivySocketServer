@@ -7,12 +7,15 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 #from server import *
 from threading import Thread
+from kivy.properties import StringProperty
 import socket
 
 class MyPageLayout(BoxLayout):
     ip = "192.168.0.196"
     # ip = 'localhost'
     port = 6666
+    clock = "as"
+
     def __init__(self, **kwargs):
         super(MyPageLayout,self).__init__(**kwargs)
         self.serv = self.server()
@@ -20,12 +23,13 @@ class MyPageLayout(BoxLayout):
         #self.sock = MySocket()
        #Thread(target=self.get_data).start()
         Thread(target=self.serverStart).start()
-        self.add_widget(
-            Button(
-                text="Hello",
-                size_hint=(.5, .5)
+        self.lbl=Label(
+                text=self.clock,
+                size_hint=(.5, .5),
+                id = "clock"
             )
-        )
+        self.add_widget(self.lbl)
+
 
     def serverStart(self):
             #self.serverRun()
@@ -51,7 +55,7 @@ class MyPageLayout(BoxLayout):
             # print(str(message))                                      # [5]
             if message:
                 print("message " + str(message))
-                #self.text = str(message)
+                self.lbl.text = str(message)
                 conn.send(b'i received: ' + message)
                 if message == b'exit':
                     print("exit")
