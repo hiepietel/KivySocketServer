@@ -25,8 +25,11 @@ class MyPageLayout(BoxLayout):
 
     def __init__(self, **kwargs):
         super(MyPageLayout, self).__init__(**kwargs)
+
+        self.rect = Rectangle(size=self.size, pos=self.pos)
         self.serv = self.server()
         self.orientation="vertical"
+        self.color = (1, 0, 1, 1)
         #self.sock = MySocket()
        #Thread(target=self.get_data).start()
 
@@ -63,10 +66,10 @@ class MyPageLayout(BoxLayout):
             #print("clock")
             myTime = time.gmtime()
             myTimeStr = ""
-            if myTime.tm_hour < 10:
-                myTimeStr += "0"+str(myTime.tm_hour)+":"
+            if myTime.tm_hour+2 < 10:
+                myTimeStr += "0"+str(myTime.tm_hour+2)+":"
             else:
-                myTimeStr += str(myTime.tm_hour)+":"
+                myTimeStr += str(myTime.tm_hour+2)+":"
             if myTime.tm_min < 10:
                 myTimeStr += "0"+str(myTime.tm_min)+":"
             else:
@@ -132,6 +135,10 @@ class MyPageLayout(BoxLayout):
                 if message == b'white':
                     print("font color is white")
                     self.lbl.color = (1, 1, 1, 1)
+                if message == b'cyan':
+                    print("font color is cyan")
+                    self.lbl.color = (0, 1, 1, 1)
+
                 if message == b'say update':
                     print("update")
                     conn.send(b'update')
