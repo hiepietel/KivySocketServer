@@ -18,7 +18,7 @@ import time
 clock = str("00:00:00")
 
 class MyPageLayout(BoxLayout):
-    ip = "192.168.0.196"
+    ip = "192.168.0.193"
     #ip = 'localhost'
     port = 6666
     clock = StringProperty
@@ -40,7 +40,7 @@ class MyPageLayout(BoxLayout):
                 text=clock,
                 bold=True,
                 color=(1, 0, 1, 1),
-                font_size="90sp",
+                font_size="100sp",
                 size_hint=(1, .5),
                 id="clockLbl"
             )
@@ -49,7 +49,7 @@ class MyPageLayout(BoxLayout):
                 text=clock,
                 bold=True,
                 color=(1, 0, 1, 1),
-                font_size="40sp",
+                font_size="50sp",
                 size_hint=(1, .1),
                 id="clockLbll"
             )
@@ -62,11 +62,18 @@ class MyPageLayout(BoxLayout):
                 size_hint=(1, .3)
 
             )
+        self.ipConfig = Label(
+            text="IP to connect\n" + self.ip,
+            bold=True,
+            font_size="50sp"
+        )
 
+        # self.(self.bgRect)
+        self.add_widget(self.ipConfig)
         #self.(self.bgRect)
-        self.add_widget(self.timelbl)
-        self.add_widget(self.datelbl)
-        self.add_widget(self.allarmlbl)
+       # self.add_widget(self.timelbl)
+        #self.add_widget(self.datelbl)
+        #self.add_widget(self.allarmlbl)
         Thread(target=self.serverStart).start()
         #Thread(1,target=self.time).start()
         Thread(target=self.time).start()
@@ -106,12 +113,22 @@ class MyPageLayout(BoxLayout):
                 myDateStr += str(myTime.tm_mon) + "-"
             myDateStr += str(myTime.tm_year)
             #check alarm
-            if self.alarmHour == myTime.tm_hour and self.alarmMinute == myTime.tm_min:
-                print("alarm")
             self.timelbl.text = myTimeStr
             self.datelbl.text = myDateStr
-            ##print(myTimeStr)
-            time.sleep(1)
+
+            if self.alarmHour == myTime.tm_hour and self.alarmMinute == myTime.tm_min and self.alarmed:
+                print("alarm")
+                self.timelbl.text = "ALARM"
+                self.timelbl.color = (1, 0, 0, 1)
+                self.datelbl.text = "GET UP"
+                self.datelbl.color = (1, 1, 1, 1)
+                time.sleep(1)
+                self.timelbl.color = (1, 1, 1, 1)
+                self.datelbl.color = (1, 0, 0, 1)
+                time.sleep(1)
+            else:
+                ##print(myTimeStr)
+                time.sleep(1)
 
     def timee(self):
         myTime = time.gmtime()
@@ -143,11 +160,17 @@ class MyPageLayout(BoxLayout):
                     conn.close()
                     run = False
                     break
+                if message == b'connect':
+                    self.add_widget(self.timelbl)
+                    self.add_widget(self.datelbl)
+                    self.add_widget(self.allarmlbl)
+                    self.remove_widget(self.ipConfig)
+                    print("connected")
                 if message[0] == 115 and message[1] == 97:
                     self.alarmHour = int(message[2]-48)*10 + int(message[3]-48)
                     self.alarmMinute = int(message[5]-48)*10 + int(message[6]-48)
                     print("alarm set to: "+str(self.alarmHour)+" : "+str(self.alarmMinute))
-                    self.allarmlbl.text = "Alarm: "+str(int(message[2]-48)) + str(int(message[3]-48)) + " : " + str(int(message[5]-48)) + str(int(message[6]-48))
+                    self.allarmlbl.text = "Alarm time: "+str(int(message[2]-48)) + str(int(message[3]-48)) + ":" + str(int(message[5]-48)) + str(int(message[6]-48))
                 if message == b'alarmOn':
                     self.allarmlbl.color = self.timelbl.color
                     print("alarm on")
